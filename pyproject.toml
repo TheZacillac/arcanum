@@ -9,13 +9,7 @@ description = "The complete domain intelligence suite — Seer, Tome, Tower, Scr
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Zac Roach" }]
-dependencies = [
-    "seer>=0.13.0",
-    "tome>=0.1.0",
-    "tower>=0.1.0",
-    "scrolls>=0.1.0",
-    "familiar>=0.1.0",
-]
+dependencies = []
 
 [project.optional-dependencies]
 seer = ["seer>=0.13.0"]
@@ -23,6 +17,13 @@ tome = ["tome>=0.1.0"]
 tower = ["tower>=0.1.0"]
 scrolls = ["scrolls>=0.1.0"]
 familiar = ["familiar>=0.1.0"]
+all = [
+    "seer>=0.13.0",
+    "tome>=0.1.0",
+    "tower>=0.1.0",
+    "scrolls>=0.1.0",
+    "familiar>=0.1.0",
+]
 dev = ["pytest>=7.0", "pytest-asyncio>=0.21"]
 
 [project.scripts]
