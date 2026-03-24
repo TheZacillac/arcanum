@@ -6,16 +6,21 @@ build-backend = "hatchling.build"
 name = "arcanum"
 version = "0.1.0"
 description = "The complete domain intelligence suite — Seer, Tome, Tower, Scrolls, and Familiar, unified"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "Zac Roach" }]
 dependencies = []
 
 [project.optional-dependencies]
+# seer/tome: installs PyO3 Python bindings only; CLI dispatch must locate
+#   the Rust binary via shutil.which (e.g. `cargo install --path seer/seer-cli`)
 seer = ["seer>=0.13.0"]
 tome = ["tome>=0.1.0"]
+# tower: entry point is `tower-mcp`, not `tower` — dispatch accordingly
 tower = ["tower>=0.1.0"]
+# scrolls: no CLI exists; subcommand must use the Python API directly
 scrolls = ["scrolls>=0.1.0"]
+# familiar: requires Python 3.11+ (the only component with that constraint)
 familiar = ["familiar>=0.1.0"]
 all = [
     "seer>=0.13.0",
@@ -27,7 +32,7 @@ all = [
 dev = ["pytest>=7.0", "pytest-asyncio>=0.21"]
 
 [project.scripts]
-arcanum = "arcanum.cli:main"
+arcanum = "arcanum.cli:_entry_point"
 
 [tool.hatch.build.targets.wheel]
 packages = ["arcanum"]
@@ -42,7 +47,7 @@ familiar = { path = "../familiar", editable = true }
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = [
