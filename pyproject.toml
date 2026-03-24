@@ -21,13 +21,13 @@ tower = ["tower>=0.1.0"]
 # scrolls: no CLI exists; subcommand must use the Python API directly
 scrolls = ["scrolls>=0.1.0"]
 # familiar: requires Python 3.11+ (the only component with that constraint)
-familiar = ["familiar>=0.1.0"]
+familiar = ["familiar>=0.1.0; python_version >= '3.11'"]
 all = [
     "seer>=0.13.0",
     "tome>=0.1.0",
     "tower>=0.1.0",
     "scrolls>=0.1.0",
-    "familiar>=0.1.0",
+    "familiar>=0.1.0; python_version >= '3.11'",
 ]
 dev = ["pytest>=7.0", "pytest-asyncio>=0.21"]
 
