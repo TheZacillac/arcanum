@@ -2,7 +2,7 @@
 
 Arcanum is the meta-package and unified CLI for the domain intelligence suite. It bundles Seer, Tome, Tower, Scrolls, and Familiar under a single install with optional dependency groups.
 
-**Status:** Early development — CLI dispatcher is stubbed, not yet wired to sub-project CLIs.
+**Status:** Early development — CLI dispatcher is stubbed; TUI skeleton in place.
 
 ---
 
@@ -10,10 +10,28 @@ Arcanum is the meta-package and unified CLI for the domain intelligence suite. I
 
 ```
 arcanum/
-├── pyproject.toml          # Package config with optional deps and uv sources
-└── arcanum/
-    ├── __init__.py          # Version: 0.1.0
-    └── cli.py               # Unified CLI dispatcher (argparse)
+├── Cargo.toml              # Rust workspace root
+├── rustfmt.toml            # Rust formatting config
+├── pyproject.toml           # Python package config with optional deps and uv sources
+├── arcanum/                 # Python package
+│   ├── __init__.py          # Version: 0.1.0
+│   └── cli.py               # Unified CLI dispatcher (argparse)
+└── arcanum-tui/             # Rust TUI binary (Ratatui)
+    ├── Cargo.toml
+    └── src/
+        ├── main.rs          # Entry point, terminal lifecycle, panic hook
+        ├── app.rs           # App state machine (Tab enum, dispatch)
+        ├── event.rs         # Crossterm event loop + tick timer
+        ├── action.rs        # Action enum (user intents)
+        ├── error.rs         # ArcanumError type
+        └── ui/
+            ├── mod.rs       # Root render, 3-zone layout
+            ├── theme.rs     # Catppuccin Frappe palette + style helpers
+            ├── header.rs    # Title + tab bar
+            ├── footer.rs    # Keybinding hints
+            ├── dashboard.rs # Suite overview landing page
+            ├── seer.rs      # Domain diagnostics tab (placeholder)
+            └── tome.rs      # Reference database tab (placeholder)
 ```
 
 ---
@@ -93,9 +111,46 @@ Each is also available as an optional dependency group for selective install.
 
 ## Build
 
+### Python (CLI dispatcher)
+
 ```bash
 pip install -e .         # or: uv pip install -e .
 arcanum --version        # Verify install
 ```
 
 Build backend: Hatchling.
+
+### Rust (TUI)
+
+```bash
+cargo build --release
+cargo clippy -- -D warnings
+cargo fmt --check
+./target/release/arcanum-tui   # Launch TUI, q to quit
+```
+
+Binary name: `arcanum-tui` (distinct from the Python `arcanum` console script).
+
+**Dependencies:** seer-core and tome-core via path deps to sibling repos (`../seer/seer-core`, `../tome/tome-core`). Uses ratatui 0.29 + crossterm 0.28 (matching seer/tome versions).
+
+---
+
+## TUI Architecture (arcanum-tui)
+
+The TUI is a pure presentation layer — all business logic lives in seer-core and tome-core.
+
+**Key modules:**
+- `app.rs` — Central state: `App` struct with `Tab` enum (Dashboard/Seer/Tome), key→action mapping, dispatch
+- `event.rs` — Spawns a tokio task that polls crossterm events + emits ticks at 4Hz via `mpsc::UnboundedChannel`
+- `action.rs` — `Action` enum decouples user intents from key bindings
+- `error.rs` — `ArcanumError` with `From` impls for `SeerError` and `TomeError`
+- `ui/theme.rs` — Full Catppuccin Frappe palette as `Color::Rgb` constants + style helpers
+- `ui/mod.rs` — Root render splits into header (3 lines), body (fills), footer (1 line)
+
+**Current state:** Tab switching works (Tab/Shift-Tab/1-3), q quits. Seer and Tome tabs render placeholder layouts. No async operations or text input wired yet.
+
+**Patterns:**
+- Follows same workspace conventions as seer/tome (workspace deps, lints, rustfmt)
+- Panic hook restores terminal before printing
+- Event loop runs in a spawned tokio task
+- All rendering takes `&App` (immutable) — state mutation happens only in `dispatch()`

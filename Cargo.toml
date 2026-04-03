@@ -1,0 +1,53 @@
+[workspace]
+resolver = "2"
+members = ["arcanum-tui"]
+
+[workspace.lints.clippy]
+unwrap_used = "warn"
+semicolon_if_nothing_returned = "warn"
+manual_let_else = "warn"
+
+[workspace.lints.rust]
+unsafe_code = "warn"
+unused_qualifications = "warn"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Zac Roach"]
+license = "MIT"
+repository = "https://github.com/TheZacillac/arcanum"
+
+[workspace.dependencies]
+# Core libraries (path deps to sibling repos)
+seer-core = { version = "0.16.0", path = "../seer/seer-core" }
+tome-core = { version = "0.1.0", path = "../tome/tome-core" }
+
+# TUI framework
+ratatui = "0.29"
+crossterm = "0.28"
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+
+# OpenTelemetry
+tracing-opentelemetry = "0.32"
+opentelemetry = "0.31"
+opentelemetry_sdk = { version = "0.31", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.31", features = ["grpc-tonic"] }
+
+# Date/time
+chrono = { version = "0.4", features = ["serde"] }
